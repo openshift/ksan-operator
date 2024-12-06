@@ -1,0 +1,23 @@
+# permissions for end users to view ksanstorages.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: ksan
+    app.kubernetes.io/managed-by: kustomize
+  name: ksanstorage-viewer-role
+rules:
+- apiGroups:
+  - ksan.openshift.io
+  resources:
+  - ksanstorages
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ksan.openshift.io
+  resources:
+  - ksanstorages/status
+  verbs:
+  - get

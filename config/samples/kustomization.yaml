@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- ksan_v1alpha1_ksanstorage.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples
