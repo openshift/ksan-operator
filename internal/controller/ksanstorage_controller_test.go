@@ -51,7 +51,12 @@ var _ = Describe("KSANStorage Controller", func() {
 						Name:      resourceName,
 						Namespace: "default",
 					},
-					// TODO(user): Specify other spec details if needed.
+					Spec: ksanv1alpha1.KSANStorageSpec{
+						Name: "testKsanCluster",
+						DevicesConfig: ksanv1alpha1.DevicesConfig{
+							Mode: ksanv1alpha1.DevicesSelectionModeAll,
+						},
+					},
 				}
 				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
 			}
