@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -44,6 +45,9 @@ type KSANStorageSpec struct {
 
 	// +kubebuilder:validation:Optional
 	KubesanParams map[string]string `json:"kubesanParams"`
+
+	// +kubebuilder:validation:Optional
+	Affinity v1.Affinity `json:"affinity,omitempty"`
 }
 
 // KSANStorageStatus defines the observed state of KSANStorage
