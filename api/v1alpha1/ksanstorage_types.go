@@ -29,16 +29,17 @@ const (
 )
 
 type DevicesConfig struct {
-	// +kubebuilder:validation:Enum="AllDevices;SelectedDevices"
+	// +kubebuilder:validation:Enum=AllDevices;SelectedDevices
+	// +kubebuilder:default=AllDevices
 	Mode DevicesSelectionMode `json:"mode"`
-	// +kubebuilder:validation:MinItems:=1
-	// +kubebuilder:validation:UniqueItems:=true
+
+	// +kubebuilder:validation:Optional
 	Devices []string `json:"devices"`
 }
 
 // KSANStorageSpec defines the desired state of KSANStorage
 type KSANStorageSpec struct {
-	// +kubebuilder:default:="KsanCluster"
+	// +kubebuilder:default="KsanCluster"
 	Name string `json:"name"`
 
 	DevicesConfig DevicesConfig `json:"devicesConfig"`

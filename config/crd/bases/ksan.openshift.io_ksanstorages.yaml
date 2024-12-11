@@ -964,15 +964,14 @@ spec:
                   devices:
                     items:
                       type: string
-                    minItems: 1
                     type: array
-                    uniqueItems: true
                   mode:
+                    default: AllDevices
                     enum:
-                    - AllDevices;SelectedDevices
+                    - AllDevices
+                    - SelectedDevices
                     type: string
                 required:
-                - devices
                 - mode
                 type: object
               kubesanParams:
