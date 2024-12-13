@@ -30,7 +30,7 @@ const (
 
 type DevicesConfig struct {
 	// +kubebuilder:validation:Enum=AllDevices;SelectedDevices
-	// +kubebuilder:default=AllDevices
+	// +kubebuilder:default=SelectedDevices
 	Mode DevicesSelectionMode `json:"mode"`
 
 	// +kubebuilder:validation:Optional
@@ -39,8 +39,8 @@ type DevicesConfig struct {
 
 // KSANStorageSpec defines the desired state of KSANStorage
 type KSANStorageSpec struct {
-	// +kubebuilder:default="KsanCluster"
-	Name string `json:"name"`
+	// +kubebuilder:default="vg1"
+	VolumeGroupName string `json:"volumeGroupName"`
 
 	DevicesConfig DevicesConfig `json:"devicesConfig"`
 
@@ -53,8 +53,7 @@ type KSANStorageSpec struct {
 
 // KSANStorageStatus defines the observed state of KSANStorage
 type KSANStorageStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true

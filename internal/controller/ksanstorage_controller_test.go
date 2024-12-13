@@ -52,7 +52,7 @@ var _ = Describe("KSANStorage Controller", func() {
 						Namespace: "default",
 					},
 					Spec: ksanv1alpha1.KSANStorageSpec{
-						Name: "testKsanCluster",
+						VolumeGroupName: "vg1",
 						DevicesConfig: ksanv1alpha1.DevicesConfig{
 							Mode: ksanv1alpha1.DevicesSelectionModeAll,
 						},
