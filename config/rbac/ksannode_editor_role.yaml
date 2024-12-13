@@ -1,0 +1,27 @@
+# permissions for end users to edit ksannodes.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: ksan
+    app.kubernetes.io/managed-by: kustomize
+  name: ksannode-editor-role
+rules:
+- apiGroups:
+  - ksan.openshift.io
+  resources:
+  - ksannodes
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ksan.openshift.io
+  resources:
+  - ksannodes/status
+  verbs:
+  - get

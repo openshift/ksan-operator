@@ -1,0 +1,9 @@
+apiVersion: ksan.openshift.io/v1alpha1
+kind: KSANNode
+metadata:
+  labels:
+    app.kubernetes.io/name: ksan
+    app.kubernetes.io/managed-by: kustomize
+  name: ksannode-sample
+spec:
+  # TODO(user): Add fields here
