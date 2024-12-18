@@ -32,8 +32,8 @@ type KSANNodeStorage struct {
 type KSANNodeSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	HostID  int               `json:"hostID,omitempty"`
-	Storage []KSANNodeStorage `json:"storage,omitempty"`
+	HostID  int                        `json:"hostID,omitempty"`
+	Storage map[string]KSANNodeStorage `json:"storage,omitempty"`
 }
 
 // KSANNodeStatus defines the observed state of KSANNode.

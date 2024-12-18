@@ -27,6 +27,8 @@ import (
 	ksanv1alpha1 "openshift/ksan-operator/api/v1alpha1"
 )
 
+const operatorNamespace = "openshift-ksan-operator"
+
 // KSANStorageReconciler reconciles a KSANStorage object
 type KSANStorageReconciler struct {
 	client.Client
@@ -49,7 +51,21 @@ type KSANStorageReconciler struct {
 func (r *KSANStorageReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	storage := &ksanv1alpha1.KSANStorage{}
+	err := r.Client.Get(ctx, req.NamespacedName, storage)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	nodes, err := r.nodesMatchingSelector(ctx, storage.Spec.NodeSelector)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.ensureKSANNodes(ctx, storage.Spec, nodes)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
