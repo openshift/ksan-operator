@@ -45,7 +45,7 @@ spec:
                   Important: Run "make" to regenerate code after modifying this file
                 type: integer
               storage:
-                items:
+                additionalProperties:
                   properties:
                     devices:
                       items:
@@ -54,7 +54,7 @@ spec:
                     volumeGroupName:
                       type: string
                   type: object
-                type: array
+                type: object
             type: object
           status:
             description: KSANNodeStatus defines the observed state of KSANNode.

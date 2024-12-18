@@ -48,7 +48,7 @@ type KSANStorageSpec struct {
 	KubesanParams map[string]string `json:"kubesanParams"`
 
 	// +kubebuilder:validation:Optional
-	Affinity v1.Affinity `json:"affinity,omitempty"`
+	NodeSelector *v1.NodeSelector `json:"nodeSelector,omitempty"`
 }
 
 // KSANStorageStatus defines the observed state of KSANStorage
