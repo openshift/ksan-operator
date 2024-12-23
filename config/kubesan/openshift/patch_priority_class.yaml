@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
+- op: add
+  path: /spec/template/spec/priorityClassName
+  value: openshift-user-critical

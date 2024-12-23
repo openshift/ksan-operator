@@ -50,7 +50,12 @@ endif
 # This is useful for CI or a project to utilize a specific version of the operator-sdk toolkit.
 OPERATOR_SDK_VERSION ?= v1.38.0
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMAGE_REGISTRY ?= quay.io
+REGISTRY_NAMESPACE ?= ksan-operator
+IMAGE_TAG ?= latest
+IMAGE_NAME ?= ksan-operator
+IMAGE_REPO ?= $(IMAGE_REGISTRY)/$(REGISTRY_NAMESPACE)/$(IMAGE_NAME)
+IMG ?= $(IMAGE_REPO):$(IMAGE_TAG)
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.30.0
 
@@ -65,7 +70,9 @@ endif
 # Be aware that the target commands are only tested with Docker which is
 # scaffolded by default. However, you might want to replace it to use other
 # tools. (i.e. podman)
-CONTAINER_TOOL ?= docker
+CONTAINER_TOOL = $(shell command -v docker 2>&1 >/dev/null && echo docker || echo podman)
+OS ?= linux
+ARCH ?= amd64
 
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
@@ -145,7 +152,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	$(CONTAINER_TOOL) build --platform=${OS}/${ARCH} -t ${IMG} .
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.

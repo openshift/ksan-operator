@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+
+resources:
+- controller-plugin.yaml
+- driver.yaml
+- node-plugin.yaml

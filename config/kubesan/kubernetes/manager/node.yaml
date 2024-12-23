@@ -1,0 +1,106 @@
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kubesan-node-controller-manager
+  namespace: system
+  labels:
+    app.kubernetes.io/name: kubesan-node-controller-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubesan-node-controller-manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kubesan-node-controller-manager
+        app.kubernetes.io/part-of: ksan-storage
+        app.kubernetes.io/component: node-controller-manager
+      annotations:
+        target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+    spec:
+      serviceAccountName: node-controller-manager-kubesan
+      terminationGracePeriodSeconds: 10
+      hostPID: true
+      containers:
+        - name: manager
+          image: kubesan
+          args:
+            - node-controller-manager
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          # TODO(user): Configure the resources accordingly based on the project requirements.
+          # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /run/qsd
+              name: qsd-sock-dir
+        - name: qemu-storage-daemon
+          image: kubesan
+          command:
+            - /usr/bin/qemu-storage-daemon
+            - --chardev
+            - socket,id=qmp-sock,path=/run/qsd/qmp.sock,server=on,wait=off
+            - --monitor
+            - chardev=qmp-sock
+            - --nbd-server
+            - addr.type=inet,addr.host=0.0.0.0,addr.port=10809,max-connections=0
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: &port 10809
+          readinessProbe:
+            tcpSocket:
+              port: *port
+            initialDelaySeconds: 1
+            periodSeconds: 1
+          volumeMounts:
+            - name: qsd-sock-dir
+              mountPath: /run/qsd
+            - name: dev
+              mountPath: /dev
+      volumes:
+        - name: qsd-sock-dir
+          emptyDir:
+            medium: Memory
+        - name: dev
+          hostPath:
+            path: /dev
+            type: Directory

@@ -1,0 +1,133 @@
+# SPDX-License-Identifier: Apache-2.0
+
+---
+# used by package internal/csi/controller
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-controller
+rules:
+  - apiGroups: [""]
+    resources: [persistentvolumeclaims]
+    verbs: [get]
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [create, delete, get]
+  - apiGroups: [kubesan.gitlab.io]
+    resources: [volumes]
+    verbs: [get, list, watch, create, delete]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubesan-csi-controller
+subjects:
+  - kind: ServiceAccount
+    name: csi-controller-plugin
+
+---
+# used by image registry.k8s.io/sig-storage/csi-provisioner
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-provisioner
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["list", "watch", "create", "update", "patch"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots"]
+    verbs: ["get", "list"]
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshotcontents"]
+    verbs: ["get", "list"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-provisioner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubesan-csi-provisioner
+subjects:
+  - kind: ServiceAccount
+    name: csi-controller-plugin
+
+---
+# used by image registry.k8s.io/sig-storage/csi-snapshotter
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-snapshotter
+rules:
+  - apiGroups: [""]
+    resources: [events]
+    verbs: [list, watch, create, update, patch]
+  - apiGroups: [snapshot.storage.k8s.io]
+    resources: [volumesnapshotclasses]
+    verbs: [get, list, watch]
+  - apiGroups: [snapshot.storage.k8s.io]
+    resources: [volumesnapshotcontents]
+    verbs: [get, list, watch, update, patch]
+  - apiGroups: [snapshot.storage.k8s.io]
+    resources: [volumesnapshotcontents/status]
+    verbs: [update, patch]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-snapshotter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubesan-csi-snapshotter
+subjects:
+  - kind: ServiceAccount
+    name: csi-controller-plugin
+
+---
+# used by package internal/csi/node
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-node
+rules:
+  - apiGroups: [kubesan.gitlab.io]
+    resources: [volumes]
+    verbs: [get, list, watch, update, patch]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: kubesan-csi-node
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kubesan-csi-node
+subjects:
+  - kind: ServiceAccount
+    name: csi-node-plugin
