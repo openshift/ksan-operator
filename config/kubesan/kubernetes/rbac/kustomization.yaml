@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
+resources:
+  - csi.yaml
+  - leader_election_role_binding.yaml
+  - leader_election_role.yaml
+  - role_binding.yaml
+  - role.yaml
+  - service_account.yaml

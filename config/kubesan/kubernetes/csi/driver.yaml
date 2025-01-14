@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  name: kubesan.gitlab.io
+spec:
+  attachRequired: false  # skip Controller{Publish,Unpublish}Volume()

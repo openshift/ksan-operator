@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+
+---
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: kubesan
+allowPrivilegedContainer: true
+allowHostDirVolumePlugin: true
+priority:
+allowHostNetwork: false
+allowHostPorts: false
+allowedCapabilities: []
+allowHostPID: true
+allowHostIPC: false
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+defaultAddCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:openshift-ksan-storage-operator:csi-controller-plugin
+  - system:serviceaccount:openshift-ksan-storage-operator:csi-node-plugin
+  - system:serviceaccount:openshift-ksan-storage-operator:cluster-controller-manager-kubesan
+  - system:serviceaccount:openshift-ksan-storage-operator:node-controller-manager-kubesan
+volumes:
+  - configMap
+  - emptyDir
+  - hostPath
+  - persistentVolumeClaim
+  - secret

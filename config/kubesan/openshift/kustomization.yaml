@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../kubernetes
+  - scc.yaml
+
+patches:
+  - target:
+      kind: Deployment
+    path: patch_priority_class.yaml
+  - target:
+      kind: DaemonSet
+    path: patch_priority_class.yaml
