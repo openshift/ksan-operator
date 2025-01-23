@@ -1,7 +1,8 @@
-package controller
+package operator
 
 import (
 	"context"
+
 	v1 "k8s.io/api/core/v1"
 	corev1helper "k8s.io/component-helpers/scheduling/corev1"
 )

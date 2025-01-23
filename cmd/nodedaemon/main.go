@@ -2,7 +2,7 @@ package nodedaemon
 
 import (
 	"crypto/tls"
-	"flag"
+	"fmt"
 	"openshift/ksan-operator/internal/nodedaemon"
 	"os"
 
@@ -14,6 +14,12 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 )
+
+var metricsAddr string
+var enableLeaderElection bool
+var probeAddr string
+var secureMetrics bool
+var enableHTTP2 bool
 
 func NewCmd(scheme *runtime.Scheme) *cobra.Command {
 	cmd := &cobra.Command{
@@ -27,29 +33,23 @@ func NewCmd(scheme *runtime.Scheme) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
+		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
+	cmd.Flags().StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	cmd.Flags().BoolVar(&enableLeaderElection, "leader-elect", false,
+		"Enable leader election for controller manager. "+
+			"Enabling this will ensure there is only one active controller manager.")
+	cmd.Flags().BoolVar(&secureMetrics, "metrics-secure", true,
+		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
+	cmd.Flags().BoolVar(&enableHTTP2, "enable-http2", false,
+		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
+
 	return cmd
 }
 
 func run(_ *cobra.Command, scheme *runtime.Scheme, _ []string) error {
 	setupLog := ctrl.Log.WithName("setup")
-
-	var metricsAddr string
-	var enableLeaderElection bool
-	var probeAddr string
-	var secureMetrics bool
-	var enableHTTP2 bool
 	var tlsOpts []func(*tls.Config)
-	flag.StringVar(&metricsAddr, "metrics-bind-address", "0", "The address the metrics endpoint binds to. "+
-		"Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable the metrics service.")
-	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
-		"Enable leader election for controller manager. "+
-			"Enabling this will ensure there is only one active controller manager.")
-	flag.BoolVar(&secureMetrics, "metrics-secure", true,
-		"If set, the metrics endpoint is served securely via HTTPS. Use --metrics-secure=false to use HTTP instead.")
-	flag.BoolVar(&enableHTTP2, "enable-http2", false,
-		"If set, HTTP/2 will be enabled for the metrics and webhook servers")
-	flag.Parse()
 
 	// if the enable-http2 flag is false (the default), http/2 should be disabled
 	// due to its vulnerabilities. More specifically, disabling http/2 will
@@ -114,14 +114,18 @@ func run(_ *cobra.Command, scheme *runtime.Scheme, _ []string) error {
 		// LeaderElectionReleaseOnCancel: true,
 	})
 	if err != nil {
-		setupLog.Error(err, "unable to start manager")
-		os.Exit(1)
+		return fmt.Errorf("unable to start manager: %w", err)
+	}
+
+	nodeName := os.Getenv("NODE_NAME")
+	if nodeName == "" {
+		return fmt.Errorf("NODE_NAME environment variable not set")
 	}
 
 	err = (&nodedaemon.Reconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		NodeName: os.Getenv("NODE_NAME"),
+		NodeName: nodeName,
 	}).SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "Unable to add nodedaemon reconciler")
