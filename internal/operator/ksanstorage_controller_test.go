@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controller
+package operator
 
 import (
 	"context"
@@ -74,8 +74,10 @@ var _ = Describe("KSANStorage Controller", func() {
 		It("should successfully reconcile the resource", func() {
 			By("Reconciling the created resource")
 			controllerReconciler := &KSANStorageReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				PodImage:          "example",
+				OperatorNamespace: typeNamespacedName.Namespace,
 			}
 
 			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{

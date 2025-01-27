@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controller
+package operator
 
 import (
 	"context"
-
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -27,17 +26,21 @@ import (
 	ksanv1alpha1 "openshift/ksan-operator/api/v1alpha1"
 )
 
-const operatorNamespace = "openshift-ksan-operator"
-
 // KSANStorageReconciler reconciles a KSANStorage object
 type KSANStorageReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme            *runtime.Scheme
+	OperatorNamespace string
+	PodImage          string
 }
 
 // +kubebuilder:rbac:groups=ksan.openshift.io,resources=ksanstorages,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=ksan.openshift.io,resources=ksanstorages/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=ksan.openshift.io,resources=ksanstorages/finalizers,verbs=update
+// +kubebuilder:rbac:groups=ksan.openshift.io,resources=ksannodes,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch;patch;update
+// +kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch;delete
+// +kubebuilder:rbac:groups=apps,resources=daemonsets,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -62,7 +65,12 @@ func (r *KSANStorageReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
-	err = r.ensureKSANNodes(ctx, storage.Spec, nodes)
+	err = r.ensureKSANNodes(ctx, storage.Spec, nodes, r.OperatorNamespace)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.createNodeDaemon(ctx, r.OperatorNamespace)
 	if err != nil {
 		return ctrl.Result{}, err
 	}

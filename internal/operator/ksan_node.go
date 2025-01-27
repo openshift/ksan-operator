@@ -1,20 +1,21 @@
-package controller
+package operator
 
 import (
 	"context"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"math/rand"
 	ksanv1alpha1 "openshift/ksan-operator/api/v1alpha1"
+
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	controllerruntime "sigs.k8s.io/controller-runtime"
 )
 
-func (r *KSANStorageReconciler) ensureKSANNodes(ctx context.Context, storageSpec ksanv1alpha1.KSANStorageSpec, nodes []v1.Node) error {
+func (r *KSANStorageReconciler) ensureKSANNodes(ctx context.Context, storageSpec ksanv1alpha1.KSANStorageSpec, nodes []v1.Node, namespace string) error {
 	for _, node := range nodes {
 		ksanNode := &ksanv1alpha1.KSANNode{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      node.Name,
-				Namespace: operatorNamespace,
+				Namespace: namespace,
 			},
 		}
 

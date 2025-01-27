@@ -1,0 +1,30 @@
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: ksan-storage-nodedaemon
+allowPrivilegedContainer: true
+allowHostDirVolumePlugin: true
+priority:
+allowHostNetwork: false
+allowHostPorts: false
+allowedCapabilities: []
+allowHostPID: true
+allowHostIPC: true
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+defaultAddCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:openshift-ksan-storage-operator:ksan-storage-nodedaemon
+volumes:
+  - configMap
+  - emptyDir
+  - hostPath
+  - secret

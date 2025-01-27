@@ -27,3 +27,7 @@ resources:
 - ksanstorage_editor_role.yaml
 - ksanstorage_viewer_role.yaml
 
+- nodedaemon_binding.yaml
+- nodedaemon_role.yaml
+- nodedaemon_scc.yaml
+- nodedaemon_service_account.yaml

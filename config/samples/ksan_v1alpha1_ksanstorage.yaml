@@ -6,4 +6,6 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
   name: ksanstorage-sample
 spec:
-  # TODO(user): Add fields here
+  volumeGroupName: test1
+  devicesConfig:
+    mode: SelectedDevices
